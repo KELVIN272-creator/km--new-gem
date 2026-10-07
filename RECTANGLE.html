@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rectangle Calculator App</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
+            color: #e2e8f0;
+        }
+
+        .app {
+            width: min(90%, 450px);
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 22px;
+            padding: 28px 22px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        h1 {
+            margin: 0 0 20px;
+            text-align: center;
+            font-size: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        input {
+            border: 1px solid #64748b;
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 18px;
+            background: rgba(15, 23, 42, 0.8);
+            color: #f8fafc;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .calculate {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+        }
+
+        .clear {
+            background: #475569;
+            color: white;
+        }
+
+        .preview {
+            margin: 22px 0 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 140px;
+            background: rgba(15, 23, 42, 0.55);
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .shape {
+            width: 140px;
+            height: 90px;
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            border: 3px solid rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .result-box {
+            background: rgba(51, 65, 85, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 14px;
+            padding: 14px 12px;
+            text-align: center;
+        }
+
+        .result-box span {
+            display: block;
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+        }
+
+        .result-box strong {
+            font-size: 1.2rem;
+            color: #f8fafc;
+        }
+
+        .message {
+            margin-top: 18px;
+            text-align: center;
+            color: #bae6fd;
+            min-height: 22px;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <h1>Rectangle App</h1>
+
+        <div class="input-group">
+            <label>
+                Width
+                <input id="width" type="number" min="0" step="0.01" placeholder="Enter width" />
+            </label>
+
+            <label>
+                Height
+                <input id="height" type="number" min="0" step="0.01" placeholder="Enter height" />
+            </label>
+        </div>
+
+        <div class="actions">
+            <button class="calculate" id="calculateBtn">Calculate</button>
+            <button class="clear" id="clearBtn" type="button">Clear</button>
+        </div>
+
+        <div class="preview">
+            <div class="shape" id="shape"></div>
+        </div>
+
+        <div class="results">
+            <div class="result-box">
+                <span>Area</span>
+                <strong id="areaValue">0</strong>
+            </div>
+            <div class="result-box">
+                <span>Perimeter</span>
+                <strong id="perimeterValue">0</strong>
+            </div>
+        </div>
+
+        <div class="message" id="message">Enter width and height to calculate.</div>
+    </div>
+
+    <script>
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const shape = document.getElementById('shape');
+        const areaValue = document.getElementById('areaValue');
+        const perimeterValue = document.getElementById('perimeterValue');
+        const message = document.getElementById('message');
+
+        function setShapeSize(width, height) {
+            const maxSide = Math.max(width, height, 1);
+            const scale = 170 / maxSide;
+            const newWidth = Math.max(80, width * scale);
+            const newHeight = Math.max(60, height * scale);
+
+            shape.style.width = `${newWidth}px`;
+            shape.style.height = `${newHeight}px`;
+        }
+
+        function calculateRectangle() {
+            const width = parseFloat(widthInput.value);
+            const height = parseFloat(heightInput.value);
+
+            if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) {
+                areaValue.textContent = '0';
+                perimeterValue.textContent = '0';
+                message.textContent = 'Please enter valid positive numbers.';
+                shape.style.width = '140px';
+                shape.style.height = '90px';
+                return;
+            }
+
+            const area = width * height;
+            const perimeter = 2 * (width + height);
+
+            areaValue.textContent = `${area.toFixed(2)} sq units`;
+            perimeterValue.textContent = `${perimeter.toFixed(2)} units`;
+            message.textContent = `Rectangle: width ${width} and height ${height}.`;
+            setShapeSize(width, height);
+        }
+
+        function clearForm() {
+            widthInput.value = '';
+            heightInput.value = '';
+            areaValue.textContent = '0';
+            perimeterValue.textContent = '0';
+            message.textContent = 'Enter width and height to calculate.';
+            shape.style.width = '140px';
+            shape.style.height = '90px';
+            widthInput.focus();
+        }
+
+        calculateBtn.addEventListener('click', calculateRectangle);
+        clearBtn.addEventListener('click', clearForm);
+
+        widthInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') calculateRectangle();
+        });
+
+        heightInput.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') calculateRectangle();
+        });
+    </script>
+</body>
+</html>
+
